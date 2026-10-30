@@ -3,6 +3,7 @@
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from shots import SCENES, SHOTS, TOTAL, FPS
+from cuts import CUTS
 from lines import LINES
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,21 +33,22 @@ def main():
     lines_out = []
     a = lines_out.append
     a("# РАСКАДРОВКА — «Теневой раб», Эпизод 1\n")
-    a(f"**Длительность:** 13:00.000 · **Шотов:** {len(SHOTS)} · "
+    a(f"**Длительность:** 13:00.000 · **Склеек:** {len(CUTS)} · "
       f"**fps:** {FPS} · **кадр:** 1280×720 (16:9)\n")
-    a("Камера в каждом шоте — непрерывное движение по кадру (Кен Бёрнс / "
-      "мультиплановый проезд), темп медленный, монтаж «на дыхании».\n")
+    a("Монтаж: средняя склейка 2.6 с. Каждая склейка — своя кадровая рамка внутри плейта "
+      "(зум/сдвиг), своё микродвижение камеры (push / pull / pan / tilt), «кипение» кадра "
+      "(субпиксельная дрожь линий) и, в сцене 4, тряска на ударах. Интеркадры — соседние "
+      "планы той же сцены.\n")
     li = 0
     for sid, title, s0, s1, shots in SCENES:
         a(f"\n## Сцена {sid}. {title}\n")
         a(f"*{tc2(s0)} — {tc2(s1)} · {s1-s0:.0f} сек · {len(shots)} шотов*\n")
-        a("| # | TC входа | Длит. | План | Движение камеры | Комментарий |")
-        a("|---|---|---|---|---|---|")
-        t = s0
-        for i, (img, dur, cam, opt) in enumerate(shots, 1):
-            a(f"| {sid}.{i} | {tc2(t)} | {dur:.1f} | {img} | {move_name(cam)} | "
-              f"{opt.get('note','')} |")
-            t += dur
+        a("| # | TC | Длит. | Плейт | Кадр (зум) | Движение | Комментарий |")
+        a("|---|---|---|---|---|---|---|")
+        cs = [c for c in CUTS if c["scene"] == sid]
+        for i, c in enumerate(cs, 1):
+            a(f"| {sid}.{i} | {tc2(c['t'])} | {c['frames']/FPS:.2f} | {c['plate']} | "
+              f"{c['zoom']:.2f} | {c['move']} | {c['note']} |")
         ls = [l for l in LINES if s0 <= l[3] < s1]
         if ls:
             a("\n**Реплики в сцене**\n")
