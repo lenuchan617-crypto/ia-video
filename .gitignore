@@ -25,3 +25,7 @@ update-hermes.sh
 
 # Monetization planning — private, never committed
 monetization/
+
+# Generated media renders (source scripts are kept, heavy output is not)
+media/**/work/
+media/**/__pycache__/
